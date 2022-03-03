@@ -45,8 +45,8 @@ userRoute.get('/wallet/withdraw', getWalletWithdrawal)
 
 
 //transactions
-userRoute.get('/transaction', jsonParser, getUserTransactions)
 userRoute.post('/transaction', multiPartParser, transactionUpload.single('proof'), createTransactions)
+userRoute.get('/transaction', jsonParser, getUserTransactions)
 
 
 //
