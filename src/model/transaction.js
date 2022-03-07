@@ -11,11 +11,12 @@ const TransactionSchema = mongoose.Schema({
   to: { type: mongoose.Schema.Types.ObjectId, ref: 'Currency', required: [true, 'To Currency must be specified'] },
   amount: { type: Number, required: [true, 'Amount is required '] },
   toReceive: { type: Number,  },
+  paymentAccount: { type: mongoose.Schema.Types.ObjectId, ref: 'PaymentAccount', required: [true, 'Payment Account must be provided'] },
   payment: { type: String, required: [true, 'Payment Mode is required '] },
   status: { type: String, default: 'pending', enum: ['successful', 'pending', 'paid', 'canceled'] },
   updated: { type: Date }
 }, {
-  timestamps: true
+  timestamps: true  
 });
 
 const { PaginatePlugin } = require('../mixin/db/paginate')

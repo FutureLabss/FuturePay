@@ -1,7 +1,7 @@
 const { TransactionSchema } = require("../../model/transaction")
 
 const { parseDBError } = require('../../mixin/dbErrorParser')
-const { transactionFields } = require("../serializers/transaction")
+const { transactionFields, transactionFieldsDetailed } = require("../serializers/transaction")
 
 exports.getUserTransactions = async function (filter, page = 0, limit = 10) {
   try {
@@ -34,7 +34,7 @@ exports.getSingle = async function (id) {
   try {
     return await TransactionSchema.findById(id)
       .select(['proof', 'toReceive', 'amount', 'payment', 'status', 'key', 'createdAt'])
-      .populate([...transactionFields])
+      .populate([...transactionFieldsDetailed])
       .lean()
   } catch (error) {
     return { error: parseDBError(error) }

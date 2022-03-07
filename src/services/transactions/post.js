@@ -2,7 +2,7 @@ const { sendMail } = require("../../../config/mail")
 const { parseDBError } = require("../../mixin/dbErrorParser")
 const { calculateExchangeRate } = require("../../mixin/services/currency")
 const { TransactionSchema } = require("../../model/transaction")
-const { transactionFields } = require("../serializers/transaction")
+const { transactionFields, transactionFieldsDetailed } = require("../serializers/transaction")
 
 const KEY_COUNT = 1000000020
 
@@ -16,8 +16,9 @@ exports.createTransactions = async function (user, data, file) {
     }
     const count = await TransactionSchema.count()
     const prefix = `FUTPAY${KEY_COUNT}${count + 1}`
-    transaction = await transaction.populate([...transactionFields])
-    transaction.toReceive = calculateExchangeRate(transaction.from,transaction.to,transaction.amount)
+    transaction = await transaction.populate([...transactionFieldsDetailed])
+    const toReceive = calculateExchangeRate(transaction.from, transaction.to, transaction.amount)
+    transaction.toReceive = toReceive - (toReceive * (transaction.paymentAccount?.charge ?? 0 + transaction.paymentAccount?.futureCharge ?? 0 ))
     if (user.id != transaction.account.user) {
       return { error: 'invalid user account' }
     }
@@ -37,7 +38,7 @@ exports.createTransactions = async function (user, data, file) {
 exports.updateTransactionStatus = async function (id, status) {
   try {
     const transaction = TransactionSchema.findByIdAndUpdate(id, { status: status }, { new: true, runValidators: true })
-      .select(['proof','toReceive', 'amount', 'payment', 'status', 'key', 'createdAt'])
+      .select(['proof', 'toReceive', 'amount', 'payment', 'status', 'key', 'createdAt'])
       .populate([...transactionFields])
       .catch(e => {
         return { error: parseDBError(e) }
@@ -77,7 +78,7 @@ const sendTransactionNotification = async function (transaction, user, type) {
   const response = await sendMail({
     to: user.email,
     subject: type == 'create' ? 'Transaction Created' : 'Transaction Update',
-    html: "<h4> Transaction details Details </h4>" + message
+    html: "<h4> Transaction  Details </h4>" + message
   }).catch(e => {
     console.log(e);
     return { error: 'cannot send email at the moment please try again send fail' }
@@ -88,7 +89,7 @@ const sendTransactionNotification = async function (transaction, user, type) {
   sendMail({
     to: 'payments@futurepay.app',
     subject: type == 'create' ? 'Transaction Created' : 'Transaction Update',
-    html: "<h4> Transaction details Details </h4>" + message
+    html: "<h4> Transaction Details </h4>" + message
   }).catch(e => {
     console.log(e);
     return { error: 'cannot send email at the moment please try again send fail' }
