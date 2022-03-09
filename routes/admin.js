@@ -5,13 +5,14 @@ const { createPaymentAccount } = require('../src/controller/account/admin')
 const { createAccount, getUserAccount } = require('../src/controller/account/user')
 const { createCurrency, updateCurrency } = require('../src/controller/currency/admin')
 const { updateTransactionStatus, getAllTransactions, getSingle, downloadProof, getTotalStats, getAllTransactionStats } = require('../src/controller/transaction/admin')
-const { getAllUser } = require('../src/controller/users/admin')
+const { getAllUser, getUserStats } = require('../src/controller/users/admin')
 const { updateWalletDepositStatus, updateWalletWithdrawStatus, getAllDepositStats } = require('../src/controller/wallet/admin')
+const { isSuperAdmin } = require('../src/mixin/permissions')
 
 const adminRoute = express.Router()
 
 //accounts
-adminRoute.post('/account/payment', jsonParser, createPaymentAccount)
+adminRoute.post('/account/payment', jsonParser, isSuperAdmin, createPaymentAccount)
 
 
 adminRoute.get('/account', jsonParser, getUserAccount)
@@ -19,8 +20,8 @@ adminRoute.post('/account', jsonParser, createAccount)
 //userRoute.put('/account/:id', jsonParser, getAll)
 
 //accounts
-adminRoute.post('/currency', jsonParser, createCurrency)
-adminRoute.put('/currency/:id', jsonParser, updateCurrency)
+adminRoute.post('/currency', jsonParser, isSuperAdmin, createCurrency)
+adminRoute.put('/currency/:id', jsonParser, isSuperAdmin, updateCurrency)
 //userRoute.put('/account/:id', jsonParser, getAll)
 
 //transactions
@@ -39,7 +40,8 @@ adminRoute.put('/wallet/withdraw/:id', jsonParser, updateWalletWithdrawStatus)
 adminRoute.get('/wallet/', getAllTransactions)
 
 //users
-adminRoute.get('/users', jsonParser, getAllUser)
+adminRoute.get('/users', jsonParser, isSuperAdmin, getAllUser)
+adminRoute.get('/users/stats/total', jsonParser, isSuperAdmin, getUserStats)
 
 
 //

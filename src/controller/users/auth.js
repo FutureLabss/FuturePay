@@ -57,7 +57,6 @@ exports.forgotPassword = async function (req, res) {
   }
 
   try {
-    console.log('sending mail')
     const user = await sendPasswordResetLink(email)
     if (user.error) {
       return res.status(400).json(user)

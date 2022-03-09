@@ -115,7 +115,6 @@ exports.getWalletWithdrawal = async function (req, res) {
     }
     return res.send(response)
   } catch (error) {
-    console.log('catech ==> ', error)
     return res.status(400).json(error)
   }
 }
@@ -133,7 +132,6 @@ exports.getWalletFlutterDeposit = async function (req, res) {
     }
     return res.send(response)
   } catch (error) {
-    console.log('catech ==> ', error)
     return res.status(400).json(error)
   }
 }

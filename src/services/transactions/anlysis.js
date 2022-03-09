@@ -6,6 +6,7 @@ const { CurrencyModel } = require("../../model/currency")
 exports.getTotalTransaction = async function () {
   try {
     return TransactionSchema.aggregate()
+      .match({status:'paid'})
       .lookup({ from: CurrencyModel.collection.name, localField: 'from', foreignField: '_id', as: 'currency' })
       .unwind('$currency')
       .group({ _id: '$currency.name', total: { $sum: '$amount' }, count: { $sum: 1 } })

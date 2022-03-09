@@ -37,13 +37,13 @@ exports.createTransactions = async function (user, data, file) {
 
 exports.updateTransactionStatus = async function (id, status) {
   try {
-    const transaction = TransactionSchema.findByIdAndUpdate(id, { status: status }, { new: true, runValidators: true })
+    const transaction = await TransactionSchema.findByIdAndUpdate(id, { status: status }, { new: true, runValidators: true })
       .select(['proof', 'toReceive', 'amount', 'payment', 'status', 'key', 'createdAt'])
       .populate([...transactionFields])
+      .lean()
       .catch(e => {
         return { error: parseDBError(e) }
       })
-
     sendTransactionNotification(transaction, transaction.user, 'update')
     return transaction
 
@@ -56,7 +56,6 @@ exports.updateTransactionStatus = async function (id, status) {
 
 
 const sendTransactionNotification = async function (transaction, user, type) {
-
 
   const message = `
   <dl>
@@ -76,7 +75,7 @@ const sendTransactionNotification = async function (transaction, user, type) {
   //TODO add attempt checker 
 
   const response = await sendMail({
-    to: user.email,
+    to: [user.email,'payments@futurepay.app'],
     subject: type == 'create' ? 'Transaction Created' : 'Transaction Update',
     html: "<h4> Transaction  Details </h4>" + message
   }).catch(e => {
@@ -86,14 +85,14 @@ const sendTransactionNotification = async function (transaction, user, type) {
 
   //notify admin
 
-  sendMail({
-    to: 'payments@futurepay.app',
-    subject: type == 'create' ? 'Transaction Created' : 'Transaction Update',
-    html: "<h4> Transaction Details </h4>" + message
-  }).catch(e => {
-    console.log(e);
-    return { error: 'cannot send email at the moment please try again send fail' }
-  })
+  // sendMail({
+  //   to: 'payments@futurepay.app',
+  //   subject: type == 'create' ? 'Transaction Created' : 'Transaction Update',
+  //   html: "<h4> Transaction Details </h4>" + message
+  // }).catch(e => {
+  //   console.log(e);
+  //   return { error: 'cannot send email at the moment please try again send fail' }
+  // })
   return response
 
 }

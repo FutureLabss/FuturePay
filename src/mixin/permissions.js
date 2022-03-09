@@ -22,7 +22,15 @@ exports.isAuthenticated = (req, res, next) => {
 }
 
 exports.isAdmin = (req, res, next) => {
-  if (req.user.type > 3) {
+  if (req.user.type >= 3) {
+    next()
+  } else {
+    return res.status(403).json({ error: "Permission denied" })
+  }
+}
+
+exports.isSuperAdmin = (req, res, next) => {
+  if (req.user.type >= 5) {
     next()
   } else {
     return res.status(403).json({ error: "Permission denied" })
