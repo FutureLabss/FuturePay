@@ -75,7 +75,7 @@ const sendTransactionNotification = async function (transaction, user, type) {
   //TODO add attempt checker 
 
   const response = await sendMail({
-    to: [user.email,'payments@futurepay.app'],
+    to: [{name:user.full_name,address:user.email},{name:'Future Pay',address:'payments@futurepay.app'}],
     subject: type == 'create' ? 'Transaction Created' : 'Transaction Update',
     html: "<h4> Transaction  Details </h4>" + message
   }).catch(e => {
