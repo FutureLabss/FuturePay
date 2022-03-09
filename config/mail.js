@@ -22,6 +22,6 @@ transporter.verify((e, s) => {
 
 
 exports.sendMail = function (data) {
-  return transporter.sendMail({ ...data, from: EMAIL_ACCOUNT })
+  return transporter.sendMail({ ...data, from: [{ name: 'FuturePay', 'address': EMAIL_ACCOUNT }] })
 
 }
